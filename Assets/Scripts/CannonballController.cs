@@ -7,4 +7,12 @@ public class CannonballController : MonoBehaviour
     {
         Destroy(gameObject, 3);
     }
+
+    private void cannonSpawn()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Instantiate(gameObject);
+        }
+    }
 }
