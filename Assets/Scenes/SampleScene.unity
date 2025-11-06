@@ -575,6 +575,7 @@ GameObject:
   - component: {fileID: 1367331661}
   - component: {fileID: 1367331660}
   - component: {fileID: 1367331659}
+  - component: {fileID: 1367331663}
   m_Layer: 0
   m_Name: Static Sprite
   m_TagString: Untagged
@@ -725,6 +726,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1367331663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1367331658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2e835bb41cf9bd44ab25ba84b49498f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1440327011
 GameObject:
   m_ObjectHideFlags: 0
