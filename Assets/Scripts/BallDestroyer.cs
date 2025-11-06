@@ -10,7 +10,10 @@ public class BallDestroyer : MonoBehaviour
         Destroy(collision.gameObject);
     }
 
-   
+   void Update() { 
+     
+    }
+
     
    
 }
