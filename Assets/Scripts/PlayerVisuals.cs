@@ -11,7 +11,6 @@ public class PlayerVisuals : MonoBehaviour
 
     void Update()
     {
-        /*
         animator.SetBool(isWalkingHash, playerController.IsWalking());
         animator.SetBool(isGroundedHash, playerController.IsGrounded());
 
@@ -24,6 +23,5 @@ public class PlayerVisuals : MonoBehaviour
                 bodyRenderer.flipX = false;
                 break;
         }
-        */
     }
 }
