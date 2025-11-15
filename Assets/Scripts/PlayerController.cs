@@ -6,9 +6,6 @@ public class PlayerController : MonoBehaviour
     private Collider2D feetColl;
     private Collider2D bodyColl;
 
-    public PlayerMovementStats MoveStats;
-   
-
     Animator animator;
     [SerializeField] LayerMask jumpToGround;
     private Vector3 velocity;
@@ -53,7 +50,6 @@ public class PlayerController : MonoBehaviour
             //currentFacingDirection = FacingDirection.left;
         }
       
-
         if (Input.GetKey(KeyCode.RightArrow))
         {
             animator.SetBool("IsWalking", true);
