@@ -1,4 +1,6 @@
+using Unity.Android.Gradle.Manifest;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -9,11 +11,15 @@ public class PlayerController : MonoBehaviour
     Animator animator;
     [SerializeField] LayerMask jumpToGround;
     private Vector3 velocity;
-    public float maxSpeed = 1.00f;
+    public float maxSpeed = 5.00f;
     public float accTime = 0.95f;
     public float decTime = 0.85f;
     //public FacingDirection currentFacingDirection;
-    
+    public float ApexHeight= 3.5f;
+    public float ApexTime = 0.5f;
+
+    public float gravity;
+    public float jumpVel;
 
     public enum FacingDirection
     {
@@ -23,6 +29,8 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        gravity = -2 * ApexHeight / (ApexTime*ApexTime);
+        jumpVel = 2 * ApexHeight * ApexTime;
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
     }
@@ -33,13 +41,19 @@ public class PlayerController : MonoBehaviour
         // The input from the player needs to be determined and
         // then passed in the to the MovementUpdate which should
         // manage the actual movement of the character.
-        Vector2 playerInput = Vector2.zero;
+        Vector2 playerInput = new()
+        {
+            x = Input.GetAxisRaw("Horizontal"),
+            y = Input.GetButtonDown("Jump") ? 1 : 0
+        };
         MovementUpdate(playerInput);
-
     }
 
     private void MovementUpdate(Vector2 playerInput)
     {
+        JumpInput(playerInput);
+        transform.position += velocity * Time.deltaTime;
+
         float accelerationRate = maxSpeed / accTime;
         float decelerationRate = maxSpeed / decTime;
         
@@ -83,21 +97,36 @@ public class PlayerController : MonoBehaviour
 
         transform.position += velocity * Time.deltaTime;
     }
-
+    private void JumpInput(Vector2 playerInput)
+    {
+        if(IsGrounded() && playerInput.y ==1)
+        {
+            velocity.y = jumpVel;
+        }
+        else if (!IsGrounded())
+        {
+            velocity.y += gravity * Time.deltaTime;
+        }
+        else
+        {
+            velocity.y = 0;
+        }
+    }
     public bool IsWalking()
     {
         return false;
     }
     public bool IsGrounded()
     {
-        return Physics2D.BoxCast(feetColl.bounds.center, feetColl.bounds.size, 0f, Vector2.down, 0.1f, jumpToGround);
+        Vector3 origin = transform.position + Vector3.down * 0.55f;
+        return Physics2D.OverlapBox(origin, new Vector2(1f, 0.2f), 0, jumpToGround);
+        //return Physics2D.BoxCast(feetColl.bounds.center, feetColl.bounds.size, 0f, Vector2.down, 0.1f, jumpToGround);
         //return false;
     }
     
     
     public FacingDirection GetFacingDirection()
     {
-        //transform.Rotate(0f, 180f, 0f);
         return FacingDirection.left;
     }
 
