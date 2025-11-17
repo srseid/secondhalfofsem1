@@ -90,7 +90,8 @@ public class PlayerController : MonoBehaviour
     }
     public bool IsGrounded()
     {
-       return Physics2D.BoxCast(feetColl.bounds.center, feetColl.bounds.size, 0f, Vector2.down, .1f, jumpToGround);
+        return Physics2D.BoxCast(feetColl.bounds.center, feetColl.bounds.size, 0f, Vector2.down, 0.1f, jumpToGround);
+        //return false;
     }
     
     
