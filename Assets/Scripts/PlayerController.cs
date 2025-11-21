@@ -17,6 +17,11 @@ public class PlayerController : MonoBehaviour
     //public FacingDirection currentFacingDirection;
     public float ApexHeight= 3.5f;
     public float ApexTime = 0.5f;
+    public float terminalSpeed = 5f;
+    //if (fall acceleration > value) {cap vertical component of velocity to not exceed value}
+    public float coyoteTime;
+    //if (isGrounded == false) {can still jump if within coyoteTime since became ungrounded}
+
 
     public float gravity;
     public float jumpVel;
@@ -111,8 +116,25 @@ public class PlayerController : MonoBehaviour
         {
             velocity.y = 0;
         }
-    }
-    public bool IsWalking()
+
+        //if (fall acceleration > value) {cap vertical component of velocity to not exceed value}
+        if (jumpVel > terminalSpeed)
+        {
+            jumpVel -= terminalSpeed;
+        }
+
+    //if (isGrounded == false) {can still jump if within coyoteTime since became ungrounded}
+    //if(IsGrounded == false)
+        {
+            //coyoteTime = 0.5f * time.deltaTIme;
+            //if(input -= coyoteTime)
+            //{
+            //JumpInput(playerInput)
+            //}
+        }
+
+}
+public bool IsWalking()
     {
         return false;
     }
