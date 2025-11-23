@@ -1934,6 +1934,9 @@ MonoBehaviour:
   decTime: 0.85
   ApexHeight: 10
   ApexTime: 1
+  terminalSpeed: -2
+  coyoteTime: 0.4
+  coyoteCount: 0
   gravity: 1
   jumpVel: 1
 --- !u!4 &1433354315

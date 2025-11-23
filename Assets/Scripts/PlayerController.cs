@@ -15,11 +15,12 @@ public class PlayerController : MonoBehaviour
     public float accTime = 0.95f;
     public float decTime = 0.85f;
     //public FacingDirection currentFacingDirection;
-    public float ApexHeight= 3.5f;
+    public float ApexHeight = 3.5f;
     public float ApexTime = 0.5f;
     public float terminalSpeed = 5f;
     //if (fall acceleration > value) {cap vertical component of velocity to not exceed value}
-    public float coyoteTime;
+    public float coyoteTime = 0.4f;
+    public float coyoteCount = 0f;
     //if (isGrounded == false) {can still jump if within coyoteTime since became ungrounded}
 
 
@@ -51,6 +52,7 @@ public class PlayerController : MonoBehaviour
             x = Input.GetAxisRaw("Horizontal"),
             y = Input.GetButtonDown("Jump") ? 1 : 0
         };
+
         MovementUpdate(playerInput);
     }
 
@@ -104,6 +106,7 @@ public class PlayerController : MonoBehaviour
     }
     private void JumpInput(Vector2 playerInput)
     {
+        coyoteCount = 0f;
         if(IsGrounded() && playerInput.y ==1)
         {
             velocity.y = jumpVel;
@@ -118,9 +121,9 @@ public class PlayerController : MonoBehaviour
         }
 
         //if (fall acceleration > value) {cap vertical component of velocity to not exceed value}
-        if (jumpVel > terminalSpeed)
+        if (rb.linearVelocity.y > terminalSpeed)
         {
-            jumpVel -= terminalSpeed;
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, terminalSpeed);
         }
 
     //if (isGrounded == false) {can still jump if within coyoteTime since became ungrounded}
@@ -133,12 +136,23 @@ public class PlayerController : MonoBehaviour
             //}
         }
 
-}
+        if (IsGrounded())
+        {
+            //coyoteCount -= Time.deltaTime;
+            coyoteCount = coyoteTime;
+        }
+        else
+        {
+            coyoteCount -= Time.deltaTime;
+            //coyoteCount = coyoteTime;
+        }
+
+    }
 public bool IsWalking()
     {
         return false;
     }
-    public bool IsGrounded()
+public bool IsGrounded()
     {
         Vector3 origin = transform.position + Vector3.down * 0.55f;
         return Physics2D.OverlapBox(origin, new Vector2(1f, 0.2f), 0, jumpToGround);
