@@ -11,22 +11,32 @@ public class PlayerController : MonoBehaviour
     Animator animator;
     [SerializeField] LayerMask jumpToGround;
     private Vector3 velocity;
-    public float maxSpeed = 5.00f;
-    public float accTime = 0.95f;
-    public float decTime = 0.85f;
+    public float maxSpeed = 2.00f;
+    public float accTime = 0.095f;
+    public float decTime = 0.085f;
+    private float acceleration;
+    private float deceleration;
     //public FacingDirection currentFacingDirection;
     public float ApexHeight = 3.5f;
     public float ApexTime = 0.5f;
     public float terminalSpeed = 5f;
-    //if (fall acceleration > value) {cap vertical component of velocity to not exceed value}
+    
     public float coyoteTime = 0.4f;
     public float coyoteCount = 0f;
-    //if (isGrounded == false) {can still jump if within coyoteTime since became ungrounded}
-
+   
 
     public float gravity;
     public float jumpVel;
+    [SerializeField] Rigidbody2D body2D;
+    public Vector2 playerInput;
+    public bool jumpPressed = false;
+   
+    public enum CharacterState
+    {
+        Idle, Walking, Jumping, Falling, Dead
+    }
 
+    public CharacterState state = CharacterState.Idle;    
     public enum FacingDirection
     {
         left, right
@@ -37,8 +47,15 @@ public class PlayerController : MonoBehaviour
     {
         gravity = -2 * ApexHeight / (ApexTime*ApexTime);
         jumpVel = 2 * ApexHeight * ApexTime;
+
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        body2D = GetComponent<Rigidbody2D>();
+
+        float acceleration = maxSpeed / accTime;
+        float deceleration = maxSpeed / decTime;
+
+        body2D.gravityScale = 0;
     }
 
     // Update is called once per frame
@@ -52,28 +69,60 @@ public class PlayerController : MonoBehaviour
             x = Input.GetAxisRaw("Horizontal"),
             y = Input.GetButtonDown("Jump") ? 1 : 0
         };
-
+        if (playerInput.y == 1) jumpPressed = true;
         MovementUpdate(playerInput);
+        //movement(playerInput);
     }
 
+    private void FixedUpdate()
+    {
+        //MovementUpdate();
+        //movement(playerInput);
+
+    }
     private void MovementUpdate(Vector2 playerInput)
     {
+        WalkInput(playerInput);
         JumpInput(playerInput);
-        transform.position += velocity * Time.deltaTime;
 
-        float accelerationRate = maxSpeed / accTime;
-        float decelerationRate = maxSpeed / decTime;
-        
+        body2D.linearVelocity = velocity;
+       
+        //<summary>
+        //Modifies velocity.x based on playerInput.x.
+        //    </summary>
+    }
+
+    private void WalkInput(Vector2 playerInput) 
+    {
+        if (playerInput.x != 0)
+        {
+            if (Mathf.Sign(playerInput.x) != Mathf.Sign(velocity.x)) velocity.x *= -1;
+            velocity.x += playerInput.x * acceleration * Time.fixedDeltaTime;
+            velocity.x = Mathf.Clamp(velocity.x, -maxSpeed, maxSpeed);
+        }
+        else if (Mathf.Abs(velocity.x) > 0.005f)
+        {
+            velocity.x += Mathf.Sign(velocity.x) * deceleration * Time.fixedDeltaTime;
+        }
+        else
+        {
+            velocity.x = 0;
+        }
+        }
+
+    private void movement(Vector2 playerInput) {
+       
+        transform.position += velocity * Time.deltaTime;
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            animator.SetBool("IsWalking", true);
+            //animator.SetBool("IsWalking", true);
             playerInput += Vector2.left;
             //currentFacingDirection = FacingDirection.left;
         }
       
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            animator.SetBool("IsWalking", true);
+            //animator.SetBool("IsWalking", true);
             playerInput += Vector2.right;
             //currentFacingDirection = FacingDirection.right;
         }
@@ -81,7 +130,7 @@ public class PlayerController : MonoBehaviour
         // if maxSpeed is met, it stays at maxSpeed
         if (playerInput.magnitude > 0)
         {
-            velocity += (Vector3)playerInput.normalized * accelerationRate * Time.deltaTime;
+            velocity += (Vector3)playerInput.normalized * acceleration * Time.deltaTime;
 
             if (velocity.magnitude > maxSpeed)
             {
@@ -91,7 +140,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            Vector3 changeInVelocity = velocity.normalized * decelerationRate * Time.deltaTime;
+            Vector3 changeInVelocity = velocity.normalized * deceleration * Time.deltaTime;
             if (changeInVelocity.magnitude > velocity.magnitude)
             {
                 velocity = Vector3.zero;
@@ -101,8 +150,6 @@ public class PlayerController : MonoBehaviour
                 velocity -= changeInVelocity;
             }
         }
-
-        transform.position += velocity * Time.deltaTime;
     }
     private void JumpInput(Vector2 playerInput)
     {
@@ -150,6 +197,7 @@ public class PlayerController : MonoBehaviour
     }
 public bool IsWalking()
     {
+        
         return false;
     }
 public bool IsGrounded()
