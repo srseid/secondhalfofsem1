@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private TrailRenderer tr;
 
 
-
+   private Vector2 playerInput;
     public enum CharacterState
     {
         Idle, Walking, Jumping, Falling, Dead
@@ -76,7 +76,7 @@ public class PlayerController : MonoBehaviour
         //        // then passed in the to the MovementUpdate which should
         //        // manage the actual movement of the character.
 
-        Vector2 playerInput = new()
+        playerInput = new()
         {
             x = Input.GetAxisRaw("Horizontal"),
             y = Input.GetButtonDown("Jump") ? 1 : 0
@@ -84,7 +84,7 @@ public class PlayerController : MonoBehaviour
 
         if (playerInput.y == 1) jumpPressed = true;
 
-        MovementUpdate(playerInput);
+        //MovementUpdate(playerInput);
         //movement(playerInput);
 
         //        if (Input.GetKeyDown(KeyCode.LeftShift) && canDash)
@@ -95,7 +95,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        //MovementUpdate();
+        MovementUpdate();
         //movement(playerInput);
         if (isDash)
         {
@@ -103,10 +103,10 @@ public class PlayerController : MonoBehaviour
         }
     }
     
-    private void MovementUpdate(Vector2 playerInput)
+    private void MovementUpdate()
     {
-        WalkInput(playerInput);
-        JumpInput(playerInput);
+        WalkInput();
+        JumpInput();
 
         rb.linearVelocity = velocity;
 
@@ -115,7 +115,7 @@ public class PlayerController : MonoBehaviour
         //    </summary>
     }
     
-    private void WalkInput(Vector2 playerInput) 
+    private void WalkInput() 
     {
         float acceleration = maxSpeed / accTime;
         float deceleration = maxSpeed / decTime;
@@ -188,7 +188,7 @@ public class PlayerController : MonoBehaviour
 
 
 
-    private void JumpInput(Vector2 playerInput)
+    private void JumpInput()
     {
         coyoteCount = 0f;
         if (IsGrounded() && playerInput.y == 1)
@@ -252,7 +252,10 @@ public class PlayerController : MonoBehaviour
 
     public bool IsWalking()
     {
-
+        if (playerInput.x == 0)
+        {
+            return false;
+        }
         return false;
     }
     public bool IsGrounded()
