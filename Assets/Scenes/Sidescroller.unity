@@ -1885,6 +1885,7 @@ GameObject:
   - component: {fileID: 1433354317}
   - component: {fileID: 1433354318}
   - component: {fileID: 1433354319}
+  - component: {fileID: 1433354320}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1921,7 +1922,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1433354312}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 86a1ce42ea3e3dd44868493ae73ec06d, type: 3}
   m_Name: 
@@ -1939,7 +1940,6 @@ MonoBehaviour:
   coyoteCount: 0
   gravity: -1
   jumpVel: -1
-  playerInput: {x: 0, y: 0}
   jumpPressed: 0
   rb: {fileID: 1433354317}
   tr: {fileID: 1433354319}
@@ -2150,6 +2150,18 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 0
   m_ApplyActiveColorSpace: 1
+--- !u!114 &1433354320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433354312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d35f2052dd19542a11161059e0356f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1598075209
 GameObject:
   m_ObjectHideFlags: 0

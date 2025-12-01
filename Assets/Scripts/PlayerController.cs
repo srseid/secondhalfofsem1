@@ -27,7 +27,6 @@ public class PlayerController : MonoBehaviour
 
     public float gravity;
     public float jumpVel;
-    public Vector2 playerInput;
     public bool jumpPressed = false;
 
     //dashing
@@ -48,6 +47,7 @@ public class PlayerController : MonoBehaviour
     }
 
     public CharacterState state = CharacterState.Idle;    
+
     public enum FacingDirection
     {
         left, right
@@ -79,7 +79,7 @@ public class PlayerController : MonoBehaviour
 
         Vector2 playerInput = new()
         {
-            x = Input.GetAxisRaw("Horizontal")
+            x = Input.GetAxisRaw("Horizontal"),
             y = Input.GetButtonDown("Jump") ? 1 : 0
         };
         
