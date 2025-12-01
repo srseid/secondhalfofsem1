@@ -4,7 +4,6 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    private Rigidbody2D rb;
     private Collider2D feetColl;
     private Collider2D bodyColl;
 
@@ -23,14 +22,37 @@ public class PlayerController : MonoBehaviour
     
     public float coyoteTime = 0.4f;
     public float coyoteCount = 0f;
-   
 
     public float gravity;
     public float jumpVel;
-    [SerializeField] Rigidbody2D body2D;
     public Vector2 playerInput;
     public bool jumpPressed = false;
-   
+
+    //dashing
+    private bool canDash = true;
+    private bool isDash;
+    private float dashPower = 20f;
+    private float dashTime = 0.2f;
+    private float dashCooldown = 1f;
+
+    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private TrailRenderer tr;
+
+
+    public IEnumerator Dash()
+    {
+        canDash = false;
+        isDash = true;
+        float originGravity = rb.gravityScale;
+        rb.gravityScale = 0f;
+        rb.velocity = new Vector2(transform.localScale.x * dashPower, 0f);
+        tr.emitting = true;
+        rb.gravityScale = originGravity;
+        isDash = false;
+        yield return new Wait(dashCooldown);
+        canDash = true;
+
+    }
     public enum CharacterState
     {
         Idle, Walking, Jumping, Falling, Dead
@@ -45,23 +67,23 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
         gravity = -2 * ApexHeight / (ApexTime*ApexTime);
         jumpVel = 2 * ApexHeight * ApexTime;
 
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        body2D = GetComponent<Rigidbody2D>();
+        rb.gravityScale = 0;
 
         float acceleration = maxSpeed / accTime;
         float deceleration = maxSpeed / decTime;
-
-        body2D.gravityScale = 0;
     }
 
-    // Update is called once per frame
     void Update()
     {
+        if (isDash)
+        {
+            return;
+        }
         // The input from the player needs to be determined and
         // then passed in the to the MovementUpdate which should
         // manage the actual movement of the character.
@@ -74,22 +96,31 @@ public class PlayerController : MonoBehaviour
         
         if (playerInput.y == 1) jumpPressed = true;
         
-        MovementUpdate(playerInput);
-        //movement(playerInput);
+        //MovementUpdate(playerInput);
+        movement(playerInput);
+
+        if (JumpInput().GetKeyDown(KeyCode.LeftShift) && canDash)
+        {
+            StartCoroutine(Dash());
+        }
     }
 
     private void FixedUpdate()
     {
         //MovementUpdate();
         //movement(playerInput);
-
+        if (isDash)
+        {
+            return;
+        }
     }
+
     private void MovementUpdate(Vector2 playerInput)
     {
         WalkInput(playerInput);
         JumpInput(playerInput);
 
-        body2D.linearVelocity = velocity;
+        rb.linearVelocity = velocity;
        
         //<summary>
         //Modifies velocity.x based on playerInput.x.
@@ -114,19 +145,25 @@ public class PlayerController : MonoBehaviour
         }
         }
 
-    private void movement(Vector2 playerInput) {
-       
+    private void movement(Vector2 playerInput) 
+    {
+        JumpInput(playerInput);
         transform.position += velocity * Time.deltaTime;
+
+        float accelerationRate = maxSpeed / accTime;
+        float decelerationRate = maxSpeed / decTime;
+
         if (Input.GetKey(KeyCode.LeftArrow))
         {
             //animator.SetBool("IsWalking", true);
             playerInput += Vector2.left;
+            
             //currentFacingDirection = FacingDirection.left;
         }
-      
+
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            //animator.SetBool("IsWalking", true);
+            animator.SetBool("IsWalking", true);
             playerInput += Vector2.right;
             //currentFacingDirection = FacingDirection.right;
         }
@@ -134,7 +171,7 @@ public class PlayerController : MonoBehaviour
         // if maxSpeed is met, it stays at maxSpeed
         if (playerInput.magnitude > 0)
         {
-            velocity += (Vector3)playerInput.normalized * acceleration * Time.deltaTime;
+            velocity += (Vector3)playerInput.normalized * accelerationRate * Time.deltaTime;
 
             if (velocity.magnitude > maxSpeed)
             {
@@ -144,7 +181,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            Vector3 changeInVelocity = velocity.normalized * deceleration * Time.deltaTime;
+            Vector3 changeInVelocity = velocity.normalized * decelerationRate * Time.deltaTime;
             if (changeInVelocity.magnitude > velocity.magnitude)
             {
                 velocity = Vector3.zero;
@@ -154,6 +191,8 @@ public class PlayerController : MonoBehaviour
                 velocity -= changeInVelocity;
             }
         }
+
+        transform.position += velocity * Time.deltaTime;
     }
     private void JumpInput(Vector2 playerInput)
     {
@@ -176,17 +215,17 @@ public class PlayerController : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, terminalSpeed);
         }
-
-    //if (isGrounded == false) {can still jump if within coyoteTime since became ungrounded}
-    //if(IsGrounded == false)
+        /*
+    if (isGrounded == false) {can still jump if within coyoteTime since became ungrounded}
+    if(IsGrounded == false)
         {
-            //coyoteTime = 0.5f * time.deltaTIme;
-            //if(input -= coyoteTime)
-            //{
-            //JumpInput(playerInput)
-            //}
+            coyoteTime = 0.5f * time.deltaTIme;
+            if(input -= coyoteTime)
+            {
+            JumpInput(playerInput)
+            }
         }
-
+        */
         if (IsGrounded())
         {
             //coyoteCount -= Time.deltaTime;
