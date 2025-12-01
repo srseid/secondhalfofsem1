@@ -1929,18 +1929,20 @@ MonoBehaviour:
   jumpToGround:
     serializedVersion: 2
     m_Bits: 64
-  maxSpeed: 5
-  accTime: 0.95
-  decTime: 0.85
+  maxSpeed: 10
+  accTime: 1
+  decTime: 1
   ApexHeight: 20
   ApexTime: 1
-  terminalSpeed: 2
+  terminalSpeed: -5
   coyoteTime: 0.4
   coyoteCount: 0
-  gravity: 1
-  jumpVel: 1
+  gravity: -1
+  jumpVel: -1
   playerInput: {x: 0, y: 0}
   jumpPressed: 0
+  rb: {fileID: 1433354317}
+  tr: {fileID: 1433354319}
   state: 0
 --- !u!4 &1433354315
 Transform:

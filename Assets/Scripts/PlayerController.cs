@@ -1,6 +1,8 @@
 
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
@@ -39,20 +41,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private TrailRenderer tr;
 
 
-    public IEnumerator Dash()
-    {
-        canDash = false;
-        isDash = true;
-        float originGravity = rb.gravityScale;
-        rb.gravityScale = 0f;
-        rb.velocity = new Vector2(transform.localScale.x * dashPower, 0f);
-        tr.emitting = true;
-        rb.gravityScale = originGravity;
-        isDash = false;
-        yield return new Wait(dashCooldown);
-        canDash = true;
-
-    }
+    
     public enum CharacterState
     {
         Idle, Walking, Jumping, Falling, Dead
@@ -87,10 +76,10 @@ public class PlayerController : MonoBehaviour
         // The input from the player needs to be determined and
         // then passed in the to the MovementUpdate which should
         // manage the actual movement of the character.
-        
+
         Vector2 playerInput = new()
         {
-            x = Input.GetAxisRaw("Horizontal"),
+            x = Input.GetAxisRaw("Horizontal")
             y = Input.GetButtonDown("Jump") ? 1 : 0
         };
         
@@ -99,7 +88,7 @@ public class PlayerController : MonoBehaviour
         //MovementUpdate(playerInput);
         movement(playerInput);
 
-        if (JumpInput().GetKeyDown(KeyCode.LeftShift) && canDash)
+        if (Input.GetKeyDown(KeyCode.LeftShift) && canDash)
         {
             StartCoroutine(Dash());
         }
@@ -238,7 +227,25 @@ public class PlayerController : MonoBehaviour
         }
 
     }
-public bool IsWalking()
+
+  public IEnumerator Dash()
+    {
+        canDash = false;
+        isDash = true;
+        float originGravity = rb.gravityScale;
+        rb.gravityScale = 0f;
+        rb.linearVelocity = new Vector2(transform.localScale.x * dashPower, 0f);
+        tr.emitting = true;
+        yield return new WaitForSeconds(dashTime);
+        tr.emitting = false;
+        rb.gravityScale = originGravity;
+        isDash = false;
+        yield return new WaitForSeconds(dashCooldown);
+        canDash = true;
+
+    }
+
+    public bool IsWalking()
     {
         
         return false;
