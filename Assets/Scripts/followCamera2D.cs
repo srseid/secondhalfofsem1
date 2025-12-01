@@ -47,6 +47,7 @@ public class followCamera2D : MonoBehaviour
         steppedPosition.x = Mathf.Clamp(steppedPosition.x, leftCameraBound, rightCameraBound);
         steppedPosition.y = Mathf.Clamp(steppedPosition.y, bottomCameraBound, steppedPosition.y);
         //make sure camera cannot see out of bounds
+        //top limit is however high the player can go
         transform.position = steppedPosition;
     }
 
