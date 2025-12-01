@@ -29,7 +29,7 @@ public class PlayerVisuals : MonoBehaviour
         switch(playerController.state)
         {
             case PlayerController.CharacterState.Walking:
-                animator.SetBool("IsWalking", true);
+                //animator.SetBool("IsWalking", true);
                 break;
             case PlayerController.CharacterState.Idle:
                
@@ -40,7 +40,7 @@ public class PlayerVisuals : MonoBehaviour
             case PlayerController.CharacterState.Falling:
                 break;
             case PlayerController.CharacterState.Dead:
-                animator.Play(deadStateHash);
+                //animator.Play(deadStateHash);
                 break;
         }
 

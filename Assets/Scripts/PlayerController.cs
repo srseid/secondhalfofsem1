@@ -6,15 +6,12 @@ using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
-    //    private Collider2D feetColl;
-    //    private Collider2D bodyColl;
-
     Animator animator;
     [SerializeField] LayerMask jumpToGround;
     private Vector3 velocity;
     public float maxSpeed = 2.00f;
-    public float accTime = 0.095f;
-    public float decTime = 0.085f;
+    public float accTime = 0.05f;
+    public float decTime = 0.05f;
     //    private float acceleration;
     //    private float deceleration;
     //    //public FacingDirection currentFacingDirection;
@@ -25,7 +22,7 @@ public class PlayerController : MonoBehaviour
     public float coyoteTime = 0.4f;
     public float coyoteCount = 0f;
 
-    public float gravity;
+    public float gravity =0f;
     public float jumpVel;
     public bool jumpPressed = false;
 
@@ -39,8 +36,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private TrailRenderer tr;
 
+    private Vector2 playerInput;
 
-   private Vector2 playerInput;
     public enum CharacterState
     {
         Idle, Walking, Jumping, Falling, Dead
@@ -57,13 +54,13 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         gravity = -2 * ApexHeight / (ApexTime * ApexTime);
-        jumpVel = 2 * ApexHeight * ApexTime;
+        jumpVel = 2 * ApexHeight / ApexTime;
 
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         rb.gravityScale = 0;
 
-       
+
     }
 
     void Update()
@@ -82,115 +79,63 @@ public class PlayerController : MonoBehaviour
             y = Input.GetButtonDown("Jump") ? 1 : 0
         };
 
-        if (playerInput.y == 1) jumpPressed = true;
 
-        //MovementUpdate(playerInput);
-        //movement(playerInput);
+        if (playerInput.y == 1) jumpPressed = true;
 
         //        if (Input.GetKeyDown(KeyCode.LeftShift) && canDash)
         //        {
         //            StartCoroutine(Dash());
-        //        }
+        //        
     }
 
     private void FixedUpdate()
     {
         MovementUpdate();
-        //movement(playerInput);
-        if (isDash)
-        {
-            return;
-        }
     }
-    
+
     private void MovementUpdate()
     {
         WalkInput();
         JumpInput();
 
+        print(velocity);
         rb.linearVelocity = velocity;
+
 
         //<summary>
         //Modifies velocity.x based on playerInput.x.
         //    </summary>
     }
-    
-    private void WalkInput() 
+
+    private void WalkInput()
     {
         float acceleration = maxSpeed / accTime;
         float deceleration = maxSpeed / decTime;
 
         if (playerInput.x != 0)
         {
-            if (Mathf.Sign(playerInput.x) != Mathf.Sign(velocity.x)) velocity.x *= -1;
+            animator.SetBool("IsWalking", true);
+            if (Mathf.Sign(playerInput.x) != Mathf.Sign(velocity.x))
+                velocity.x *= -1;
+
             velocity.x += playerInput.x * acceleration * Time.fixedDeltaTime;
             velocity.x = Mathf.Clamp(velocity.x, -maxSpeed, maxSpeed);
         }
         else if (Mathf.Abs(velocity.x) > 0.005f)
         {
+            animator.SetBool("IsWalking", false);
             velocity.x += Mathf.Sign(velocity.x) * deceleration * Time.fixedDeltaTime;
         }
         else
         {
             velocity.x = 0;
+            
         }
-        }
-    
-    //private void movement(Vector2 playerInput)
-    //{
-    //    JumpInput(playerInput);
-    //    transform.position += velocity * Time.deltaTime;
-
-    //    float accelerationRate = maxSpeed / accTime;
-    //    float decelerationRate = maxSpeed / decTime;
-
-    //    if (Input.GetKey(KeyCode.LeftArrow))
-    //    {
-    //        //animator.SetBool("IsWalking", true);
-    //        playerInput += Vector2.left;
-
-    //        //currentFacingDirection = FacingDirection.left;
-    //    }
-
-    //    if (Input.GetKey(KeyCode.RightArrow))
-    //    {
-    //        //animator.SetBool("IsWalking", true);
-    //        playerInput += Vector2.right;
-    //        //currentFacingDirection = FacingDirection.right;
-    //    }
-
-    //    // if maxSpeed is met, it stays at maxSpeed
-    //    if (playerInput.magnitude > 0)
-    //    {
-    //        velocity += (Vector3)playerInput.normalized * accelerationRate * Time.deltaTime;
-
-    //        if (velocity.magnitude > maxSpeed)
-    //        {
-    //            velocity = velocity.normalized * maxSpeed;
-    //        }
-
-    //    }
-    //    else
-    //    {
-    //        Vector3 changeInVelocity = velocity.normalized * decelerationRate * Time.deltaTime;
-    //        if (changeInVelocity.magnitude > velocity.magnitude)
-    //        {
-    //            velocity = Vector3.zero;
-    //        }
-    //        else
-    //        {
-    //            velocity -= changeInVelocity;
-    //        }
-    //    }
-
-
-    //}
-
-
+    }
 
     private void JumpInput()
     {
-        coyoteCount = 0f;
+        //coyoteCount = 0f;
         if (IsGrounded() && playerInput.y == 1)
         {
             velocity.y = jumpVel;
@@ -223,11 +168,11 @@ public class PlayerController : MonoBehaviour
         if (IsGrounded())
         {
             //coyoteCount -= Time.deltaTime;
-            coyoteCount = coyoteTime;
+            //coyoteCount = coyoteTime;
         }
         else
         {
-            coyoteCount -= Time.deltaTime;
+            //coyoteCount -= Time.deltaTime;
             //coyoteCount = coyoteTime;
         }
 
@@ -254,7 +199,7 @@ public class PlayerController : MonoBehaviour
     {
         if (playerInput.x == 0)
         {
-            return false;
+            animator.SetBool("IsWalking", true);
         }
         return false;
     }

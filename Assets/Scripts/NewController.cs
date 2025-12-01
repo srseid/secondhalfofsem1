@@ -71,14 +71,12 @@ public class NewController : MonoBehaviour
         {
 
             print("jdkljdks");
-            animator.SetBool("IsWalking", true);
             playerInput += Vector2.left;
             //currentFacingDirection = FacingDirection.left;
         }
 
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            animator.SetBool("IsWalking", true);
             playerInput += Vector2.right;
             //currentFacingDirection = FacingDirection.right;
         }
