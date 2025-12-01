@@ -45,6 +45,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
         gravity = -2 * ApexHeight / (ApexTime*ApexTime);
         jumpVel = 2 * ApexHeight * ApexTime;
 
@@ -64,12 +65,15 @@ public class PlayerController : MonoBehaviour
         // The input from the player needs to be determined and
         // then passed in the to the MovementUpdate which should
         // manage the actual movement of the character.
+        
         Vector2 playerInput = new()
         {
             x = Input.GetAxisRaw("Horizontal"),
             y = Input.GetButtonDown("Jump") ? 1 : 0
         };
+        
         if (playerInput.y == 1) jumpPressed = true;
+        
         MovementUpdate(playerInput);
         //movement(playerInput);
     }
