@@ -6,9 +6,13 @@ using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("References")]
+    public PlayerStats MoveStats;
     Animator animator;
-    [SerializeField] LayerMask jumpToGround;
-    private Vector3 velocity;
+
+    private Vector2 velocity;
+    private Vector2 playerInput;
+
     public float maxSpeed = 2.00f;
     public float accTime = 0.05f;
     public float decTime = 0.05f;
@@ -22,7 +26,7 @@ public class PlayerController : MonoBehaviour
     public float coyoteTime = 0.4f;
     public float coyoteCount = 0f;
 
-    public float gravity =0f;
+    public float gravity = 0f;
     public float jumpVel;
     public bool jumpPressed = false;
 
@@ -33,10 +37,12 @@ public class PlayerController : MonoBehaviour
     private float dashTime = 0.2f;
     private float dashCooldown = 1f;
 
+    [SerializeField] LayerMask jumpToGround;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private TrailRenderer tr;
+    [SerializeField] private CapsuleCollider2D cc;
 
-    private Vector2 playerInput;
+
 
     public enum CharacterState
     {
@@ -57,6 +63,7 @@ public class PlayerController : MonoBehaviour
         jumpVel = 2 * ApexHeight / ApexTime;
 
         rb = GetComponent<Rigidbody2D>();
+        //cc = GetComponent<CapsuleCollider2D>();
         animator = GetComponent<Animator>();
         rb.gravityScale = 0;
 
@@ -91,6 +98,7 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         MovementUpdate();
+
     }
 
     private void MovementUpdate()
@@ -109,10 +117,34 @@ public class PlayerController : MonoBehaviour
 
     private void WalkInput()
     {
+        //if (playerInput != Vector2.zero)
+        //{
+        //    Vector2 targetVel = Vector2.zero;
+        //    if (Dash)
+        //    {
+        //        targetVel = new Vector2(playerInput.x, 0f) * MoveStats.dashSpeed;
+        //    }
+        //    else
+        //    {
+        //        targetVel = new Vector2(playerInput.x, 0f) * MoveStats.walkSpeed;
+        //    }
+
+        //    velocity = Vector2.Lerp(velocity, targetVel, acceleration * Time.fixedDeltaTime);
+        //    rb.linearVelocity = new Vector2(velocity.x, rb.linearVelocity.y);
+        //}
+        //else if (playerInput == Vector2.zero)
+        //{
+        //    velocity = Vector.Lerp(velocity, Vector2.zero, deceleration * Time.fixedDeltaTime);
+        //    rb.linearVelocity = new Vector2(velocity.x, rb.linearVelocity.y);
+        //}
+
+
+
         float acceleration = maxSpeed / accTime;
         float deceleration = maxSpeed / decTime;
 
-        if (playerInput.x != 0)
+        Vector2 playerInput = Vector2.zero;
+        if (playerInput.x < 0)
         {
             animator.SetBool("IsWalking", true);
             if (Mathf.Sign(playerInput.x) != Mathf.Sign(velocity.x))
@@ -129,8 +161,9 @@ public class PlayerController : MonoBehaviour
         else
         {
             velocity.x = 0;
-            
+
         }
+        //transform.position += velocity * Time.deltaTime;
     }
 
     private void JumpInput()
@@ -195,6 +228,9 @@ public class PlayerController : MonoBehaviour
 
     //    }
 
+
+
+
     public bool IsWalking()
     {
         if (playerInput.x == 0)
@@ -207,14 +243,27 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 origin = transform.position + Vector3.down * 0.55f;
         return Physics2D.OverlapBox(origin, new Vector2(1f, 0.2f), 0, jumpToGround);
-        //return Physics2D.BoxCast(feetColl.bounds.center, feetColl.bounds.size, 0f, Vector2.down, 0.1f, jumpToGround);
+        
+        //if(origin.x == null)
+        {
+          //  IsGrounded();
+        } 
         //return false;
     }
 
 
     public FacingDirection GetFacingDirection()
     {
-        return FacingDirection.left;
+        if (playerInput.x < 0)
+        {
+            return FacingDirection.left;
+        }
+
+        if (playerInput.x > 0)
+        {
+            return FacingDirection.right;
+        }
+        return FacingDirection.right;
     }
 
 
