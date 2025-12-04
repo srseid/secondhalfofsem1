@@ -9,6 +9,7 @@ public class PlayerVisuals : MonoBehaviour
     private readonly int isWalkingHash = Animator.StringToHash("IsWalking");
     private readonly int isGroundedHash = Animator.StringToHash("IsGrounded");
     private readonly int dieTriggerHash = Animator.StringToHash("Die");
+    private readonly int jumpTriggerHash = Animator.StringToHash("Jump");
     private readonly int deadStateHash = Animator.StringToHash("Dead");
 
     void Update()
@@ -35,7 +36,7 @@ public class PlayerVisuals : MonoBehaviour
                
                 break;
             case PlayerController.CharacterState.Jumping:
-               
+                animator.SetTrigger(jumpTriggerHash);
                 break;
             case PlayerController.CharacterState.Falling:
                 break;

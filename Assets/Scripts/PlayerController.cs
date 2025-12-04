@@ -146,6 +146,7 @@ public class PlayerController : MonoBehaviour
         //coyoteCount = 0f;
         if (IsGrounded() && playerInput.y == 1)
         {
+            
             velocity.y = jumpVel;
         }
         else if (!IsGrounded())
@@ -212,6 +213,7 @@ public class PlayerController : MonoBehaviour
     }
     public bool IsGrounded()
     {
+        animator.SetTrigger("Jumping");
         Vector3 origin = transform.position + Vector3.down * 0.55f;
         return Physics2D.OverlapBox(origin, new Vector2(1f, 0.2f), 0, jumpToGround);
         
