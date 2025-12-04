@@ -36,7 +36,7 @@ public class PlayerVisuals : MonoBehaviour
                
                 break;
             case PlayerController.CharacterState.Jumping:
-                animator.SetTrigger(jumpTriggerHash);
+                //animator.SetTrigger(jumpTriggerHash);
                 break;
             case PlayerController.CharacterState.Falling:
                 break;
