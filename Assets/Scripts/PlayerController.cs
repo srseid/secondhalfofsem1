@@ -302,7 +302,7 @@ public class PlayerController : MonoBehaviour
 
     public FacingDirection GetFacingDirection()
     {
-        }
+        
         return FacingDirection.left;
     }
 
