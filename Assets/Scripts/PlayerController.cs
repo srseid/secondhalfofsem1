@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour
     public float coyoteTime = 0.4f;
     public float coyoteCount = 0f;
 
+    //jumping
     public float gravity = 0f;
     public float horizontal;
     public float jumpVel;
@@ -35,6 +36,7 @@ public class PlayerController : MonoBehaviour
     private float dashTime = 0.2f;
     private float dashCooldown = 1f;
 
+    //walljump
     private bool isWallJumping;
     private float wallJumpDirection;
     private float wallJumpTime = 0.2f;

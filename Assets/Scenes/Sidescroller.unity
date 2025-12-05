@@ -354,7 +354,7 @@ GameObject:
   - component: {fileID: 340386625}
   - component: {fileID: 340386624}
   - component: {fileID: 340386623}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Square (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -584,7 +584,7 @@ GameObject:
   - component: {fileID: 491896556}
   - component: {fileID: 491896555}
   - component: {fileID: 491896554}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Square (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2959,7 +2959,7 @@ GameObject:
   - component: {fileID: 1133129239}
   - component: {fileID: 1133129238}
   - component: {fileID: 1133129237}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Square (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3573,6 +3573,7 @@ MonoBehaviour:
   horizontal: 0
   jumpVel: 0.5
   jumpPressed: 0
+  bodyRenderer: {fileID: 874392359}
   jumpToGround:
     serializedVersion: 2
     m_Bits: 64
@@ -3592,7 +3593,7 @@ Transform:
   m_GameObject: {fileID: 1433354312}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -23.32, y: -4.38, z: 0}
+  m_LocalPosition: {x: -12.7, y: -4.38, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
