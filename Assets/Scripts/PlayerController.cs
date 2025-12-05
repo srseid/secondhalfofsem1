@@ -23,8 +23,10 @@ public class PlayerController : MonoBehaviour
     public float coyoteCount = 0f;
 
     public float gravity = 0f;
+    public float horizontal;
     public float jumpVel;
     public bool jumpPressed = false;
+    private bool isFacingRight = true;
 
     //dashing
     private bool canDash = true;
@@ -33,9 +35,20 @@ public class PlayerController : MonoBehaviour
     private float dashTime = 0.2f;
     private float dashCooldown = 1f;
 
+    private bool isWallJumping;
+    private float wallJumpDirection;
+    private float wallJumpTime = 0.2f;
+    private float wallJumpingCounter;
+    private float wallJumpingDuration = 0.4f;
+    private Vector2 wallJumpingPower = new Vector2(8f, 16f);
+    public SpriteRenderer bodyRenderer;
+
     [SerializeField] LayerMask jumpToGround;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private TrailRenderer tr;
+    [SerializeField] private LayerMask wallLayer;
+    [SerializeField] private Transform wallCheck;
+
 
 
 
@@ -66,20 +79,36 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        WallJump();
+        Flip();
+
+        if (!isWallJumping)
+        {
+            Flip(); 
+        }
+
+        horizontal = Input.GetAxisRaw("Horizontal");
+
         playerInput = new()
         {
-            x = Input.GetAxisRaw("Horizontal"),
+            x = horizontal,
             y = Input.GetButtonDown("Jump") ? 1 : 0
         };
 
 
         if (playerInput.y == 1) jumpPressed = true;
 
+
         if (Input.GetKeyDown(KeyCode.LeftShift) && canDash)
         {
             StartCoroutine(Dash());
 
         }
+        if (isDash)
+        {
+            return;
+        }
+
     }
 
     private IEnumerator Dash()
@@ -106,13 +135,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (isDash)
-        {
-            return;
-        }
-
         MovementUpdate();
-        
     }
 
     private void MovementUpdate()
@@ -150,12 +173,10 @@ public class PlayerController : MonoBehaviour
             Vector3 changeInVelocity = velocity.normalized * decelerationRate * Time.deltaTime;
             if (changeInVelocity.magnitude > velocity.magnitude)
             {
-                
                 velocity = Vector3.zero;
             }
             else
             {
-
                 velocity -= changeInVelocity;
             }
         }
@@ -209,9 +230,58 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    
-    
+    private void Flip() 
+    {
+        if(isFacingRight && horizontal < 0f || !isFacingRight && horizontal > 0f)
+        {
+            isFacingRight = !isFacingRight;
+            Vector3 localScale = transform.localScale;
+            localScale.x *= -1f;
+            transform.localScale = localScale;
+        }
 
+        //if (playerInput != 0f)
+        {
+            //bodyRenderer.flipX = true;
+        }
+
+       // if (playerInput != 0f)
+        {
+            //bodyRenderer.flipX = false;
+        }
+    }
+    
+    
+    public bool isWalled()
+    {
+        return Physics2D.OverlapCircle(wallCheck.position, 0.2f, wallLayer);
+    }
+
+    private void WallJump()
+    {
+       wallJumpingCounter -= Time.deltaTime;
+
+        if (Input.GetButtonDown("Jump") && wallJumpingCounter > 0f)
+        {
+            isWallJumping = true;
+            rb.linearVelocity = new Vector2(wallJumpDirection * wallJumpingPower.x, wallJumpingPower.y);
+            wallJumpingCounter = 0f;
+
+            if(transform.localScale.x != wallJumpDirection)
+            {
+                isFacingRight = !isFacingRight;
+                Vector3 localScale = transform.localScale;
+                localScale.x *= -1f;
+                transform.localScale = localScale; 
+            }
+            Invoke(nameof(StopWallJumping), wallJumpingDuration);
+        }
+   }
+
+    private void StopWallJumping()
+    {
+        isWallJumping = false;
+    }
     public bool IsJumping()
     {
         return false;
@@ -232,18 +302,8 @@ public class PlayerController : MonoBehaviour
 
     public FacingDirection GetFacingDirection()
     {
-
-        if (playerInput.x < 0)
-        {
-            
-            return FacingDirection.left;
         }
-
-        if (playerInput.x > 0)
-        {
-            return FacingDirection.right;
-        }
-        return FacingDirection.right;
+        return FacingDirection.left;
     }
 
 

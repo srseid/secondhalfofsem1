@@ -27,6 +27,7 @@ public class PlayerVisuals : MonoBehaviour
                 break;
         }
 
+
         switch(playerController.state)
         {
             case PlayerController.CharacterState.Walking:

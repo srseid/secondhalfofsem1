@@ -18,9 +18,9 @@ public class ParallaxLayerController : MonoBehaviour
         Vector3 cameraDelta = viewCamera.transform.position - cameraStartPos;
 
         float layerDeltaX = cameraDelta.x * cameraDeltaScalar;
-        float layerDeltay = cameraDelta.y * cameraDeltaScalar;
+        float layerDeltaY = cameraDelta.y * cameraDeltaScalar;
 
-        Vector3 newLayerPos = layerStartPos + new Vector3(layerDeltaX, layerDeltay);
+        Vector3 newLayerPos = layerStartPos + new Vector3(layerDeltaX, layerDeltaY);
         transform.position = Vector3.Lerp(transform.position, newLayerPos, cameraDeltaScalar);
     }
 
