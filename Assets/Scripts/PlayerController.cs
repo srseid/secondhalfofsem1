@@ -240,14 +240,14 @@ public class PlayerController : MonoBehaviour
             transform.localScale = localScale;
         }
 
-        //if (playerInput != 0f)
+        if (playerInput.x != 0f)
         {
-            //bodyRenderer.flipX = true;
+            bodyRenderer.flipX = true;
         }
 
-       // if (playerInput != 0f)
+        if (playerInput.x != 0f)
         {
-            //bodyRenderer.flipX = false;
+            bodyRenderer.flipX = false;
         }
     }
     
