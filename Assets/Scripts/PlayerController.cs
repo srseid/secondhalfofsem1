@@ -6,15 +6,14 @@ using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
-    Animator animator;
-
+    //walk
     private Vector3 velocity;
     private Vector2 playerInput;
-
     public float maxSpeed = 2.00f;
     public float accTime = 0.05f;
     public float decTime = 0.05f;
     
+    //jump
     public float ApexHeight = 3.5f;
     public float ApexTime = 0.5f;
     public float terminalSpeed = 5f;
@@ -22,35 +21,43 @@ public class PlayerController : MonoBehaviour
     public float coyoteTime = 0.4f;
     public float coyoteCount = 0f;
 
-    //jumping
     public float gravity = 0f;
     public float horizontal;
     public float jumpVel;
-    public bool jumpPressed = false;
-    private bool isFacingRight = true;
+    public bool jumpPressed = true;
 
-    //dashing
-    private bool canDash = true;
-    private bool isDash = false;
-    private float dashSpeed = 10f;
-    private float dashTime = 0.2f;
-    private float dashCooldown = 1f;
+    //charge
+    private bool canCharge = true;
+    private bool isCharging = false;
+    private float chargeSpeed = 10f;
+    private float chargeTime = 0.2f;
+    private float chargeCooldown = 1f;
 
-    //walljump
-    private bool isWallJumping;
-    private float wallJumpDirection;
-    private float wallJumpTime = 0.2f;
-    private float wallJumpingCounter;
-    private float wallJumpingDuration = 0.4f;
-    private Vector2 wallJumpingPower = new Vector2(8f, 16f);
-    public SpriteRenderer bodyRenderer;
+    //wall jump
+    private bool wallTouch;
+    private bool wallBounce;
+    private float wallBounceDirection;
+    private float wallBounceTime = 0.3f;
+    private float wallBounceTimer;
+    private float wallBounceDuration = 0.3f;
+    private Vector2 wallBouncePower = new Vector2(10f, 15f);
+    public Vector2 wallCheckSize = new Vector2(0.49f, 0.03f);
 
+
+    //fall damage
+    private float maxFallSpeed = 0f;
+    public float minFallDamage = 10f;
+    private float fallDistance;
+   
+    //player attributes
     [SerializeField] LayerMask jumpToGround;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private TrailRenderer tr;
     [SerializeField] private LayerMask wallLayer;
     [SerializeField] private Transform wallCheck;
-
+    Animator animator;
+    private bool directionDefaultRight = true;
+    public SpriteRenderer bodyRenderer;
 
 
 
@@ -61,12 +68,6 @@ public class PlayerController : MonoBehaviour
 
     public CharacterState state = CharacterState.Idle;
 
-    public enum FacingDirection
-    {
-        left, right
-    }
-
-
     void Start()
     {
         gravity = -2 * ApexHeight / (ApexTime * ApexTime);
@@ -75,20 +76,10 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         rb.gravityScale = 0;
-        
-
     }
 
     void Update()
     {
-        WallJump();
-        Flip();
-
-        if (!isWallJumping)
-        {
-            Flip(); 
-        }
-
         horizontal = Input.GetAxisRaw("Horizontal");
 
         playerInput = new()
@@ -101,39 +92,55 @@ public class PlayerController : MonoBehaviour
         if (playerInput.y == 1) jumpPressed = true;
 
 
-        if (Input.GetKeyDown(KeyCode.LeftShift) && canDash)
+        if (Input.GetKeyDown(KeyCode.LeftShift) && canCharge)
         {
-            StartCoroutine(Dash());
+            StartCoroutine(Charge());
 
         }
-        if (isDash)
+
+        if (isCharging)
         {
             return;
         }
 
+        WallBounce();
+        Flip();
+        if (!wallBounce)
+        {
+            Flip();
+        }
+        //print(jumpVel);
+        if (rb.velocity.y > 8) //if falling
+        {
+            animator.SetTrigger("Die");
+        }
+        print(velocity.y);
+        if (velocity.y <= -7)
+        {
+            animator.SetTrigger("Die");
+        }
+
     }
 
-    private IEnumerator Dash()
+    private IEnumerator Charge()
     {
-        canDash = false;
-        isDash = true;
+        canCharge = false;
+        isCharging = true;
 
         float originGravity = rb.gravityScale;
         rb.gravityScale = 0f;
 
-        velocity = new Vector2(transform.localScale.x * dashSpeed, 0f);
+        velocity = new Vector2(transform.localScale.x * chargeSpeed, 0f);
         tr.emitting = true;
-        yield return new WaitForSeconds(dashTime);
+        yield return new WaitForSeconds(chargeTime);
 
 
         tr.emitting = false;
         rb.gravityScale = originGravity;
-        isDash = false;
-        yield return new WaitForSeconds(dashCooldown);
-        canDash = true;
-
+        isCharging = false;
+        yield return new WaitForSeconds(chargeCooldown);
+        canCharge = true;
     }
-
 
     private void FixedUpdate()
     {
@@ -145,12 +152,8 @@ public class PlayerController : MonoBehaviour
         WalkInput();
         JumpInput();
 
-        print(velocity);
+        //print(velocity);
         rb.linearVelocity = velocity;
-
-        //<summary>
-        //Modifies velocity.x based on playerInput.x.
-        //    </summary>
     }
 
     private void WalkInput()
@@ -187,109 +190,58 @@ public class PlayerController : MonoBehaviour
 
     private void JumpInput()
     {
-        //coyoteCount = 0f;
-        if (IsGrounded() && playerInput.y == 1)
+        if (IsGrounded() && jumpPressed)
         {
             animator.SetBool("IsJumping", true);
             velocity.y = jumpVel;
+            jumpPressed = false;
         }
         else if (!IsGrounded())
         {
             animator.SetBool("IsJumping", false);
             velocity.y += gravity * Time.deltaTime;
+            jumpPressed = false;
         }
         else
         {
             velocity.y = 0;
         }
-
-        //if (fall acceleration > value) {cap vertical component of velocity to not exceed value}
-        if (rb.linearVelocity.y > terminalSpeed)
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, terminalSpeed);
-        }
-        /*
-    if (isGrounded == false) {can still jump if within coyoteTime since became ungrounded}
-    if(IsGrounded == false)
-        {
-            coyoteTime = 0.5f * time.deltaTIme;
-            if(input -= coyoteTime)
-            {
-            JumpInput(playerInput)
-            }
-        }
-        */
-        if (IsGrounded())
-        {
-            //coyoteCount -= Time.deltaTime;
-            //coyoteCount = coyoteTime;
-        }
-        else
-        {
-            //coyoteCount -= Time.deltaTime;
-            //coyoteCount = coyoteTime;
-        }
-
     }
 
     private void Flip() 
     {
-        if(isFacingRight && horizontal < 0f || !isFacingRight && horizontal > 0f)
-        {
-            isFacingRight = !isFacingRight;
-            Vector3 localScale = transform.localScale;
-            localScale.x *= -1f;
-            transform.localScale = localScale;
-        }
-
-        if (playerInput.x != 0f)
+        if (horizontal < 0f)
         {
             bodyRenderer.flipX = true;
         }
 
-        if (playerInput.x != 0f)
+        if (horizontal > 0f)
         {
             bodyRenderer.flipX = false;
         }
     }
-    
-    
-    public bool isWalled()
-    {
-        return Physics2D.OverlapCircle(wallCheck.position, 0.2f, wallLayer);
-    }
 
-    private void WallJump()
+    private void WallBounce()
     {
-       wallJumpingCounter -= Time.deltaTime;
-
-        if (Input.GetButtonDown("Jump") && wallJumpingCounter > 0f)
+       wallBounceTimer -= Time.deltaTime;
+        //print(Time.deltaTime);
+        if (Input.GetButtonDown("Jump") && wallBounceTimer > 0f)
         {
-            isWallJumping = true;
-            rb.linearVelocity = new Vector2(wallJumpDirection * wallJumpingPower.x, wallJumpingPower.y);
-            wallJumpingCounter = 0f;
+            wallBounce = true;
+            rb.linearVelocity = new Vector2(wallBounceDirection * wallBouncePower.x, wallBouncePower.y);
+            //rb.velocity = new Vector2(horizontal * wallBouncePower.x, wallBouncePower.y);
+            wallBounceTimer = 0f;
 
-            if(transform.localScale.x != wallJumpDirection)
-            {
-                isFacingRight = !isFacingRight;
-                Vector3 localScale = transform.localScale;
-                localScale.x *= -1f;
-                transform.localScale = localScale; 
-            }
-            Invoke(nameof(StopWallJumping), wallJumpingDuration);
+            wallBounce = false;
         }
-   }
-
-    private void StopWallJumping()
-    {
-        isWallJumping = false;
+       
     }
+
+
     public bool IsJumping()
     {
         return false;
     }
-
-
     public bool IsWalking()
     {
         return false;
@@ -298,15 +250,5 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 origin = transform.position + Vector3.down * 0.55f;
         return Physics2D.OverlapBox(origin, new Vector2(1f, 0.2f), 0, jumpToGround);
-       
     }
-
-
-    public FacingDirection GetFacingDirection()
-    {
-        
-        return FacingDirection.left;
-    }
-
-
 }

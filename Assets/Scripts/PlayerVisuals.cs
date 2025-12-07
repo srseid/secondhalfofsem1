@@ -17,15 +17,15 @@ public class PlayerVisuals : MonoBehaviour
         animator.SetBool(isWalkingHash, playerController.IsWalking());
         animator.SetBool(isGroundedHash, playerController.IsGrounded());
 
-        switch (playerController.GetFacingDirection())
-        {
-            case PlayerController.FacingDirection.left:
-                bodyRenderer.flipX = true;
-                break;
-            case PlayerController.FacingDirection.right:
-                bodyRenderer.flipX = false;
-                break;
-        }
+        //switch (playerController.GetFacingDirection())
+        //{
+        //    case PlayerController.FacingDirection.left:
+        //        bodyRenderer.flipX = true;
+        //        break;
+        //    case PlayerController.FacingDirection.right:
+        //        bodyRenderer.flipX = false;
+        //        break;
+        //}
 
 
         switch(playerController.state)
@@ -42,7 +42,7 @@ public class PlayerVisuals : MonoBehaviour
             case PlayerController.CharacterState.Falling:
                 break;
             case PlayerController.CharacterState.Dead:
-                //animator.Play(deadStateHash);
+                animator.Play(deadStateHash);
                 break;
         }
 
