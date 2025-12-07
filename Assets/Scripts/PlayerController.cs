@@ -70,9 +70,10 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        //determine gravity and jump velocity
         gravity = -2 * ApexHeight / (ApexTime * ApexTime);
         jumpVel = 2 * ApexHeight / ApexTime;
-
+        //initialize player inspector attributes
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         rb.gravityScale = 0;
@@ -80,8 +81,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        //player inputs
         horizontal = Input.GetAxisRaw("Horizontal");
-
         playerInput = new()
         {
             x = horizontal,
@@ -91,7 +92,7 @@ public class PlayerController : MonoBehaviour
 
         if (playerInput.y == 1) jumpPressed = true;
 
-
+        //if press left shift and can charge, player charges
         if (Input.GetKeyDown(KeyCode.LeftShift) && canCharge)
         {
             StartCoroutine(Charge());
@@ -103,18 +104,20 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        //call 
         WallBounce();
         Flip();
+
+        //if player wall bounces, flip character to different direction
         if (!wallBounce)
         {
             Flip();
         }
-        //print(jumpVel);
-        if (rb.velocity.y > 8) //if falling
-        {
-            animator.SetTrigger("Die");
-        }
-        print(velocity.y);
+       
+
+        //fall damage
+        //if falling velocity reaches -7 or more, player dies
+        //print(velocity.y);
         if (velocity.y <= -7)
         {
             animator.SetTrigger("Die");
@@ -124,21 +127,29 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator Charge()
     {
+        //cannot continuously press charge 
         canCharge = false;
+        //it is charging rn
         isCharging = true;
 
         float originGravity = rb.gravityScale;
         rb.gravityScale = 0f;
 
+        //move player speed
         velocity = new Vector2(transform.localScale.x * chargeSpeed, 0f);
+        //make trail blaze
         tr.emitting = true;
+        //do it for '' time
         yield return new WaitForSeconds(chargeTime);
 
-
+        //stop trail blaze
         tr.emitting = false;
         rb.gravityScale = originGravity;
+        //no longer charging
         isCharging = false;
+        //wait for '' until you can charge again
         yield return new WaitForSeconds(chargeCooldown);
+        //now you can charge
         canCharge = true;
     }
 
@@ -153,14 +164,18 @@ public class PlayerController : MonoBehaviour
         JumpInput();
 
         //print(velocity);
+        //indicate variable
         rb.linearVelocity = velocity;
     }
 
     private void WalkInput()
     {
+        //consistent movement by time.deltatime
         transform.position += velocity * Time.deltaTime;
+
         float accelerationRate = maxSpeed / accTime;
         float decelerationRate = maxSpeed / decTime;
+
         // if maxSpeed is met, it stays at maxSpeed
         if (playerInput.magnitude > 0)
         {
@@ -174,6 +189,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            //if no longer moving, slow down player and stop walking animation
             animator.SetBool("IsWalking", false);
             Vector3 changeInVelocity = velocity.normalized * decelerationRate * Time.deltaTime;
             if (changeInVelocity.magnitude > velocity.magnitude)
@@ -190,20 +206,24 @@ public class PlayerController : MonoBehaviour
 
     private void JumpInput()
     {
+        //if player is grounded and is able to jump
         if (IsGrounded() && jumpPressed)
         {
+            //make jump animation, control jump velocity, cannot jump while jumping
             animator.SetBool("IsJumping", true);
             velocity.y = jumpVel;
             jumpPressed = false;
         }
         else if (!IsGrounded())
         {
+            //if not grounded, make player fall, and player cannot jump
             animator.SetBool("IsJumping", false);
             velocity.y += gravity * Time.deltaTime;
             jumpPressed = false;
         }
         else
         {
+            //not moving
             velocity.y = 0;
         }
     }
@@ -212,11 +232,13 @@ public class PlayerController : MonoBehaviour
     {
         if (horizontal < 0f)
         {
+            //flip sprite to face right
             bodyRenderer.flipX = true;
         }
 
         if (horizontal > 0f)
         {
+            //flip sprite to face left
             bodyRenderer.flipX = false;
         }
     }
@@ -227,15 +249,18 @@ public class PlayerController : MonoBehaviour
         //print(Time.deltaTime);
         if (Input.GetButtonDown("Jump") && wallBounceTimer > 0f)
         {
+            //player is wall bouncing
             wallBounce = true;
+            //make player bounce off wall
             rb.linearVelocity = new Vector2(wallBounceDirection * wallBouncePower.x, wallBouncePower.y);
             //rb.velocity = new Vector2(horizontal * wallBouncePower.x, wallBouncePower.y);
             wallBounceTimer = 0f;
+            //no longer bouncing
 
-            wallBounce = false;
         }
-       
-    }
+        else { wallBounce = false; }
+
+        }
 
 
     public bool IsJumping()
@@ -248,6 +273,7 @@ public class PlayerController : MonoBehaviour
     }
     public bool IsGrounded()
     {
+        //detect if player is on solid ground, if not use gravity
         Vector3 origin = transform.position + Vector3.down * 0.55f;
         return Physics2D.OverlapBox(origin, new Vector2(1f, 0.2f), 0, jumpToGround);
     }
