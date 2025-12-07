@@ -880,7 +880,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a01406614883de47bf9b1b80d0cc523, type: 3}
   m_Name: 
@@ -3752,8 +3752,6 @@ MonoBehaviour:
   ApexHeight: 2
   ApexTime: 0.5
   terminalSpeed: 0.5
-  coyoteTime: 0.4
-  coyoteCount: 0
   gravity: 0
   horizontal: 0
   jumpVel: 0.5

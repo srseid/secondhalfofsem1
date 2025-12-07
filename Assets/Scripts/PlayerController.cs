@@ -122,7 +122,7 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetTrigger("Die");
         }
-
+        print(playerInput.y);
     }
 
     private IEnumerator Charge()
