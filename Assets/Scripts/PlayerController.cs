@@ -18,8 +18,8 @@ public class PlayerController : MonoBehaviour
     public float ApexTime = 0.5f;
     public float terminalSpeed = 5f;
 
-    public float coyoteTime = 0.4f;
-    public float coyoteCount = 0f;
+    //public float coyoteTime = 0.4f;
+    //public float coyoteCount = 0f;
 
     public float gravity = 0f;
     public float horizontal;
@@ -29,7 +29,7 @@ public class PlayerController : MonoBehaviour
     //charge
     private bool canCharge = true;
     private bool isCharging = false;
-    private float chargeSpeed = 10f;
+    private float chargeSpeed = 5f;
     private float chargeTime = 0.2f;
     private float chargeCooldown = 1f;
 
@@ -114,10 +114,10 @@ public class PlayerController : MonoBehaviour
             Flip();
         }
        
-
         //fall damage
         //if falling velocity reaches -7 or more, player dies
         //print(velocity.y);
+
         if (velocity.y <= -7)
         {
             animator.SetTrigger("Die");
@@ -131,7 +131,6 @@ public class PlayerController : MonoBehaviour
         canCharge = false;
         //it is charging rn
         isCharging = true;
-
         float originGravity = rb.gravityScale;
         rb.gravityScale = 0f;
 
